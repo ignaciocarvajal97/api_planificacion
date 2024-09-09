@@ -1,0 +1,11 @@
+SELECT se.fk_servicio, 
+       s.fk_cliente_despacho, 
+	   se.fecha_real_arribo, 
+	   se.hora_real_arribo, 
+	   se.hora_real_salida, 
+	   se.tiempo_estadia
+FROM public.servicios_etapas se
+LEFT JOIN public.servicios s ON se.fk_servicio = s.id
+WHERE se.titulo = 'PRESENTACION EN CLIENTE'
+      AND se.fecha_real_arribo != '0'
+      AND se.tiempo_estadia != 'NULL';

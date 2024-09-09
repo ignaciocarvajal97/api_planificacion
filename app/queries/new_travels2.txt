@@ -1,0 +1,72 @@
+SELECT
+  ser.id AS fk_servicio,
+  ser.estado /* 0 pre servicio 1 transito 2 terminado 999 eliminado */,
+  COALESCE(eta.eta_fecha, '') AS eta_fecha /* fecha de llegada del barco */,
+  /* etapas del servicio */
+  COALESCE(eta_1.tipo, 0) AS etapa_tipo /* 1 retiro, 2 presentacion, 3 devolucion, 0 almacenaje */,
+  COALESCE(eta_1.titulo, '') AS etapa_titulo,
+  CASE
+    WHEN eta_1.tipo = 3 THEN (
+      SELECT COALESCE(eta_2.fecha, '') 
+      FROM public.servicios_etapas AS eta_2 
+      WHERE eta_2.tipo = 2 AND eta_1.fk_servicio = eta_2.fk_servicio
+      LIMIT 1
+    )
+    ELSE COALESCE(eta_1.fecha, '')
+  END AS etapa_1_fecha,
+  CASE
+    WHEN eta_1.tipo = 3 THEN (
+      SELECT COALESCE(eta_2.hora, '') 
+      FROM public.servicios_etapas AS eta_2 
+      WHERE eta_2.tipo = 2 AND eta_1.fk_servicio = eta_2.fk_servicio
+      LIMIT 1
+    )
+    ELSE COALESCE(eta_1.hora, '')
+  END AS etapa_1_hora,
+  eta_0.fk_direccion AS direccion_id_salida,
+  dir_1.id AS direccion_id_llegada,
+  (
+    SELECT temp1.tiempo 
+    FROM public.tiempodistanciadirecciones AS temp1 
+    WHERE eta_0.fk_direccion = temp1.dir1 AND temp1.dir2 = dir_1.id 
+    ORDER BY id DESC LIMIT 1
+  ) AS tiempo_minutos,
+  (
+    SELECT temp1.distancia 
+    FROM public.tiempodistanciadirecciones AS temp1 
+    WHERE eta_0.fk_direccion = temp1.dir1 AND temp1.dir2 = dir_1.id 
+    ORDER BY id DESC LIMIT 1
+  ) AS distancia_mts,
+  CASE 
+    WHEN ser.cont_tipo_mov = 'SALIDA' AND ser.cont_tipo = 'VACIO' THEN CONCAT('S-V ', COALESCE(ser.cont_hora, ''))
+    WHEN ser.cont_tipo_mov = 'SALIDA' AND ser.cont_tipo = 'LLENO' THEN CONCAT('S-F ', COALESCE(ser.cont_hora, ''))
+    WHEN ser.cont_tipo_mov = 'INGRESO' AND ser.cont_tipo = 'VACIO' THEN 'A-V'
+    WHEN ser.cont_tipo_mov = 'INGRESO' AND ser.cont_tipo = 'LLENO' THEN 'A-F'
+    WHEN ser.cont_tipo_mov = 'CAMBIO POSICION' AND ser.cont_tipo = 'VACIO' THEN 'A-V'
+    WHEN ser.cont_tipo_mov = 'CAMBIO POSICION' AND ser.cont_tipo = 'LLENO' THEN 'A-F'
+    ELSE '' 
+  END AS posicion_tipo /* tipo de la ultima posicion, si se guardo vacio, o lleno, etc */,
+  com_1.comuna_nombre
+FROM
+  public.servicios AS ser
+  INNER JOIN public.usuarios AS comer ON ser.fk_comercial = comer.usu_rut
+  LEFT JOIN public.clientes AS cli_fact ON ser.fk_cliente_facturacion = cli_fact.cli_codigo
+  LEFT JOIN public.clientes AS cli_desp ON ser.fk_cliente_despacho = cli_desp.cli_codigo
+  LEFT JOIN public.naves AS nave ON ser.fk_nave = nave.nave_id
+  LEFT JOIN public.naves_etas AS eta ON ser.fk_eta = eta.eta_id
+  LEFT JOIN public.contenedores_tipos AS cont_tip ON ser.fk_tipo_contenedor = cont_tip.cont_id
+  LEFT JOIN public.contenedores_tamanos AS cont_tam ON ser.fk_contenedor_tamano = cont_tam.conttam_id
+  LEFT JOIN public.servicios_etapas AS eta_1 ON ser.id = eta_1.fk_servicio
+  LEFT JOIN public.direcciones AS dir_1 ON eta_1.fk_direccion = dir_1.id
+  LEFT JOIN public.comunas AS com_1 ON dir_1."comunaComunaId" = com_1.comuna_id
+  LEFT JOIN public.servicios_etapas_conductores AS cond_eta_1 ON eta_1.id = cond_eta_1.fk_etapa
+  LEFT JOIN public.usuarios AS cond_1 ON cond_eta_1.fk_conductor = cond_1.usu_rut
+  LEFT JOIN public.taller_equipos AS tract_1 ON cond_eta_1.fk_tracto = tract_1.id
+  LEFT JOIN public.servicios_etapas AS eta_0 ON eta_1.fk_etapa_anterior = eta_0.id
+WHERE
+  /* 1 en transito 2 cerrado */
+  ser.estado = 1
+/* quitar id servicio */
+ORDER BY 
+  ser.id,
+  eta_1.posicion ASC;

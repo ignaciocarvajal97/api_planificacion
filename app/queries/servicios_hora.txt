@@ -1,0 +1,5 @@
+SELECT fecha_desde, fecha_hasta, fk_servicio
+FROM public.timeline_programacion_conductores
+WHERE 
+    TO_TIMESTAMP(fecha_desde, 'DD-MM-YYYY HH24:MI') >= CURRENT_DATE AND
+    TO_TIMESTAMP(fecha_hasta, 'DD-MM-YYYY HH24:MI') <= (CURRENT_DATE + INTERVAL '23 hours 59 minutes');

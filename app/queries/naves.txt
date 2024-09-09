@@ -1,0 +1,23 @@
+SELECT DISTINCT COALESCE(nave.nave_nombre, '') AS servicio_nave_nombre
+FROM
+    public.servicios AS ser
+    INNER JOIN public.usuarios AS comer ON ser.fk_comercial = comer.usu_rut
+    LEFT JOIN public.clientes AS cli_fact ON ser.fk_cliente_facturacion = cli_fact.cli_codigo
+    LEFT JOIN public.clientes AS cli_desp ON ser.fk_cliente_despacho = cli_desp.cli_codigo
+    LEFT JOIN public.naves AS nave ON ser.fk_nave = nave.nave_id
+    LEFT JOIN public.naves_etas AS eta ON ser.fk_eta = eta.eta_id
+    LEFT JOIN public.contenedores_tipos AS cont_tip ON ser.fk_tipo_contenedor = cont_tip.cont_id
+    LEFT JOIN public.contenedores_tamanos AS cont_tam ON ser.fk_contenedor_tamano = cont_tam.conttam_id
+    LEFT JOIN public.servicios_etapas AS eta_1 ON ser.id = eta_1.fk_servicio
+    LEFT JOIN public.direcciones AS dir_1 ON eta_1.fk_direccion = dir_1.id
+    LEFT JOIN public.comunas AS com_1 ON dir_1."comunaComunaId" = com_1.comuna_id
+    LEFT JOIN public.servicios_etapas_conductores AS cond_eta_1 ON eta_1.id = cond_eta_1.fk_etapa
+    LEFT JOIN public.usuarios AS cond_1 ON cond_eta_1.fk_conductor = cond_1.usu_rut
+    LEFT JOIN public.taller_equipos AS tract_1 ON cond_eta_1.fk_tracto = tract_1.id
+    LEFT JOIN public.servicios_etapas AS eta_0 ON eta_1.fk_etapa_anterior = eta_0.id
+WHERE
+    ser.estado = 1
+    AND eta_1.tipo = 1
+    AND TO_DATE(eta_1.fecha, 'DD-MM-YYYY') > (CURRENT_DATE - INTERVAL '1 month')
+ORDER BY
+    servicio_nave_nombre;

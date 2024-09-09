@@ -1,0 +1,76 @@
+select
+ser.id as fk_servicio
+
+, ser.estado /* 0 pre servicio 1 transito 2 terminado 999 eliminado */
+, ser.referencia /* la referencia con que el cliente identifica el servicio */
+, concat ( case when TRIM(comer.usu_nombre) LIKE '% %' then left(TRIM(comer.usu_nombre), strpos(TRIM(comer.usu_nombre), ' ') - 1) else TRIM(comer.usu_nombre) end ,' '
+, case when TRIM(comer.usu_apellido) LIKE '% %' then left(TRIM(comer.usu_apellido), strpos(TRIM(comer.usu_apellido), ' ') - 1) else TRIM(comer.usu_apellido) end ) as comercial_nombre /* ejecutivo comercial */
+, cli_fact.cli_nombre as cli_fact_nombre /* clienbte de facturacion */
+, cli_desp.cli_codigo as cli_desp_nombre /* cliente para el despacho */
+, com_1.comuna_nombre as comuna_nombre
+
+, ser.fk_tipo_servicio as servicio_codigo /* importacion exportacion almacenamiento desconsolidado etc*/
+, coalesce(nave.nave_nombre,'') as servicio_nave_nombre /* nombre del barco */
+, coalesce(eta.eta_fecha,'') as eta_fecha /* fecha de llegada del barco */
+
+, ser.fk_tipo_carga /* fcl contenedor full, lcl contenedor parcial, vehi auto */
+, ser.numero_contenedor
+, coalesce(cont_tip.cont_nombre,'') as cont_tipo_nombre /* si es dry es seco, refeer es con temperatura */
+, coalesce(cont_tam.conttam_tamano,'') as cont_tamano /* 20 40 60 */
+, ser.contenedor_peso
+, ser.contenedor_peso_carga
+
+/* etapas del servicio */
+, coalesce(eta_1.tipo, 0) as etapa_tipo /* 1 retiro, 2 presentacion, 3 devolucion, 0 almacenaje */
+, coalesce (eta_1.titulo, '') as etapa_titulo
+, coalesce(eta_1.fecha, '') as etapa_1_fecha
+, coalesce(eta_1.hora, '') as etapa_1_hora
+, eta_0.fk_direccion as direccion_id_salida
+, dir_1.id as direccion_id_llegada
+, (SELECT temp1.tiempo FROM public.tiempodistanciadirecciones as temp1 where eta_0.fk_direccion=temp1.dir1 and temp1.dir2=dir_1.id order by id desc limit 1) as tiempo_minutos
+, (SELECT temp1.distancia FROM public.tiempodistanciadirecciones as temp1 where eta_0.fk_direccion=temp1.dir1 and temp1.dir2=dir_1.id order by id desc limit 1) as distancia_mts
+, coalesce(dir_1.nombre,'') as etapa_1_lugar_nombre
+, concat(dir_1.nombre) as etapa_1_direccion_texto
+, concat(cond_1.usu_rut) as etapa_1_conductor_rut
+, concat ( TRIM(coalesce(cond_1.usu_nombre,'')),' ',TRIM(coalesce(cond_1.usu_apellido,'')) ) as etapa_1_conductor_nombre
+, coalesce(tract_1.patente,'') as etapa_1_tracto
+, comer.usu_nombre as nombre_comercial
+
+, coalesce(ser.almacenaje_principal,'') as almacenaje_principal /* donde se guardo el contenedor cuando se fue a retirar, y antes de la presentacion en cliente */
+, concat( coalesce(ser.cont_fila,''),'-',coalesce(ser.cont_columna,''),'-',coalesce(ser.cont_posicion) ) as posicion_ubicacion /* ultima ubicacion en el patio de TNM */
+, case 
+when ser.cont_tipo_mov='SALIDA' and ser.cont_tipo='VACIO' THEN concat('S-V ',coalesce(ser.cont_hora,''))
+when ser.cont_tipo_mov='SALIDA' and ser.cont_tipo='LLENO' THEN concat('S-F ',coalesce(ser.cont_hora,''))
+when ser.cont_tipo_mov='INGRESO' and ser.cont_tipo='VACIO' THEN 'A-V'
+when ser.cont_tipo_mov='INGRESO' and ser.cont_tipo='LLENO' THEN 'A-F'
+when ser.cont_tipo_mov='CAMBIO POSICION' and ser.cont_tipo='VACIO' THEN 'A-V'
+when ser.cont_tipo_mov='CAMBIO POSICION' and ser.cont_tipo='LLENO' THEN 'A-F'
+else '' end as posicion_tipo /* tipo de la ultima posicion, si se guardo vacio, o lleno, etc */
+
+from
+public.servicios as ser
+inner join public.usuarios as comer on ser.fk_comercial=comer.usu_rut
+left join public.clientes as cli_fact on ser.fk_cliente_facturacion=cli_fact.cli_codigo
+left join public.clientes as cli_desp on ser.fk_cliente_despacho=cli_desp.cli_codigo
+left join public.naves as nave on ser.fk_nave=nave.nave_id
+left join public.naves_etas as eta on ser.fk_eta=eta.eta_id
+left join public.contenedores_tipos as cont_tip on ser.fk_tipo_contenedor=cont_tip.cont_id
+left join public.contenedores_tamanos as cont_tam on ser.fk_contenedor_tamano=cont_tam.conttam_id
+
+left join public.servicios_etapas as eta_1 on ser.id=eta_1.fk_servicio
+left join public.direcciones as dir_1 on eta_1.fk_direccion=dir_1.id
+left join public.comunas as com_1 on dir_1."comunaComunaId"=com_1.comuna_id
+left join public.servicios_etapas_conductores as cond_eta_1 on eta_1.id=cond_eta_1.fk_etapa
+left join public.usuarios as cond_1 on cond_eta_1.fk_conductor=cond_1.usu_rut
+left join public.taller_equipos as tract_1 on cond_eta_1.fk_tracto=tract_1.id
+
+left join public.servicios_etapas as eta_0 on eta_1.fk_etapa_anterior=eta_0.id
+
+
+WHERE
+
+ ser.id = {}
+order by 
+ser.id
+, eta_1.posicion 
+asc
