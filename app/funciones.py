@@ -6,6 +6,7 @@ Created on Fri Oct 13 09:25:30 2023
 """
 from datetime import datetime
 from datetime import datetime, timedelta
+import time as t
 import pandas as pd
 from app.utils2 import obtener_hora_pais
 def ajustar_valores(diccionario):
@@ -87,6 +88,14 @@ def generate_availability_matrix(dataframe, dates_with_hours):
     availability_matrix = pd.DataFrame(0, columns=dates_with_hours, index=dataframe.index)
     
     # Iterar sobre las filas del DataFrame
+    print("generate_availability_matrix")
+    # id                          107710
+    # etapa              retiro_full_val
+    # DT inicio      2024-09-10 13:00:00
+    # DT final       2024-09-10 15:55:00
+    # cont_tamano                     40
+    # peso_cont                    12630
+    t1 = t.perf_counter(), t.process_time()
     for index, row in dataframe.iterrows():
         #start_time = datetime.strptime(row['DT inicio'], '%Y-%m-%d %H:%M:%S')  # Convertir la hora de inicio a datetime
         #end_time = datetime.strptime(row['DT final'], '%Y-%m-%d %H:%M:%S')  # Convertir la hora de finalización a datetime
@@ -99,6 +108,9 @@ def generate_availability_matrix(dataframe, dates_with_hours):
             hour_dt = datetime.strptime(hour, '%d-%m-%Y %H:%M:%S')
             if start_time <= hour_dt <= end_time:
                 availability_matrix.loc[index, hour] = 1
+    t2 = t.perf_counter(), t.process_time()
+    print(f" Real time: {t2[0] - t1[0]:.2f} seconds")
+    print(f" CPU time: {t2[1] - t1[1]:.2f} seconds")
     
     return availability_matrix
 

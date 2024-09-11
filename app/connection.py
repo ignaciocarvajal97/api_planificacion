@@ -88,26 +88,38 @@ def connectionDB_todf(query):
 
 def transform_dataframe(df):
     # Reemplazar etapa_tipo nulos o vacíos por 0
-    df['etapa_tipo'].fillna(0, inplace=True)
+    # df['etapa_tipo'].fillna(0, inplace=True)
+    df['etapa_tipo'] = df['etapa_tipo'].fillna(0)
     df['etapa_tipo'] = df['etapa_tipo'].replace('', 0)
 
     # Reemplazar etapa_titulo, etapa_1_fecha, etapa_1_hora nulos o vacíos por ''
-    df['etapa_titulo'].fillna('', inplace=True)
-    df['etapa_1_fecha'].fillna('', inplace=True)
-    df['etapa_1_hora'].fillna('', inplace=True)
+    df[['etapa_titulo', 'etapa_1_fecha', 'etapa_1_hora']] = df[['etapa_titulo', 'etapa_1_fecha', 'etapa_1_hora']].fillna('')
 
     # Identificar registros con etapa_tipo=2 y etapa_tipo=3 en el mismo fk_servicio
-    etapa_2 = df[df['etapa_tipo'] == 2]
+    # etapa_2 = df[df['etapa_tipo'] == 2]
+    etapa_2 = df[df['etapa_tipo'] == 2][['fk_servicio', 'etapa_1_fecha', 'etapa_1_hora']]
     etapa_3 = df[df['etapa_tipo'] == 3]
+    
+    # Merge etapa_2 con etapa_3 para combinar fechas y horas
+    merged = pd.merge(df[df['etapa_tipo'] == 3][['fk_servicio']], etapa_2, on='fk_servicio', how='inner')
+    
+    print('ETAPA 2 ANTES:', etapa_2)
+    print('ETAPA 3 ANTES:', df[df['etapa_tipo'] == 3][['fk_servicio', 'etapa_1_fecha', 'etapa_1_hora']])
 
     # Combinar etapa_1_fecha y etapa_1_hora de etapa_tipo=2 en etapa_tipo=3 para el mismo fk_servicio
-    for servicio_id in set(etapa_2['fk_servicio']).intersection(etapa_3['fk_servicio']):
-        etapa_3_indices = etapa_3.index[etapa_3['fk_servicio'] == servicio_id]
-        etapa_2_indices = etapa_2.index[etapa_2['fk_servicio'] == servicio_id]
+    # for servicio_id in set(etapa_2['fk_servicio']).intersection(etapa_3['fk_servicio']):
+    #     etapa_3_indices = etapa_3.index[etapa_3['fk_servicio'] == servicio_id]
+    #     etapa_2_indices = etapa_2.index[etapa_2['fk_servicio'] == servicio_id]
 
-        if len(etapa_2_indices) > 0 and len(etapa_3_indices) > 0:
-            fecha_hora = etapa_2.loc[etapa_2_indices[0], ['etapa_1_fecha', 'etapa_1_hora']]
-            df.loc[etapa_3_indices, ['etapa_1_fecha', 'etapa_1_hora']] = fecha_hora.values
+    #     if len(etapa_2_indices) > 0 and len(etapa_3_indices) > 0:
+    #         fecha_hora = etapa_2.loc[etapa_2_indices[0], ['etapa_1_fecha', 'etapa_1_hora']]
+    #         df.loc[etapa_3_indices, ['etapa_1_fecha', 'etapa_1_hora']] = fecha_hora.values
+    
+    etapa_3.update(merged.set_index('fk_servicio')[['etapa_1_fecha', 'etapa_1_hora']])
+    
+    df[df['etapa_tipo'] == 3] = etapa_3
+    
+    print('ETAPA 3 MERGED:', merged)
 
     return df
 
@@ -148,9 +160,6 @@ def rename_df(df):
 
 
 def merged(date, df):
-    
-  
-
     with open( "app/queries/new_travels.txt", "r") as archivo:
         contenido = archivo.read()
         
@@ -215,7 +224,7 @@ def merged(date, df):
     merged_df.drop('fk_cliente_despacho', axis=1, inplace=True)
     
     # Reemplazar los valores NaN por 3 horas (180 minutos) en 'percentil_70_tiempo_cliente'
-    merged_df['percentil_70_tiempo_cliente'].fillna(180, inplace=True)
+    merged_df.fillna({'percentil_70_tiempo_cliente': 180}, inplace=True)
     
     # Exportar el DataFrame merged_df a un archivo Excel en el directorio actual
     merged_df.to_excel('percentile_73_data_without_outliers.xlsx', index=False)
