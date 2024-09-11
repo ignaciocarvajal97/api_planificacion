@@ -223,6 +223,8 @@ class Planning:
             self.capacidad_20 = capacidad_20
             self.capacidad_20_pesados = capacidad_20_pesados
             
+            self.dates_with_hours = generate_hours_for_date(self.fecha_formateada)
+            
             ventanas_horarias = simulador_de_horarios(self.dates_with_hours, simulador(fk_servicio))
             
             hour_sum_from_dict = {}
