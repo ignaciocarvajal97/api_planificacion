@@ -227,7 +227,7 @@ def merged(date, df):
     merged_df.fillna({'percentil_70_tiempo_cliente': 180}, inplace=True)
     
     # Exportar el DataFrame merged_df a un archivo Excel en el directorio actual
-    merged_df.to_excel('percentile_73_data_without_outliers.xlsx', index=False)
+    #merged_df.to_excel('percentile_73_data_without_outliers.xlsx', index=False)
     
     print("DataFrame exportado exitosamente a 'percentile_73_data_without_outliers.xlsx'")
     return merged_df

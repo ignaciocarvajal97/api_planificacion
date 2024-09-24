@@ -187,17 +187,17 @@ def simulador_de_horarios(fecha_lista, dict_simulador):
         final = fecha_obj + timedelta(minutes=dict_simulador['duracion_llegada'])
         
         # Definir los límites de tiempo en el mismo día
-        limite_inferior = fecha_obj.replace(hour=5, minute=0, second=0, microsecond=0)
-        limite_superior = (fecha_obj + timedelta(days=1)).replace(hour=3, minute=0, second=0, microsecond=0)
+        limite_inferior = fecha_obj.replace(hour=3, minute=0, second=0, microsecond=0)
+        limite_superior = (fecha_obj + timedelta(days=1)).replace(hour=4, minute=0, second=0, microsecond=0)
      
         print(inicio, final)
         # Filtrar las ventanas de tiempo basadas en los límites
-        if inicio >= limite_inferior and final <= limite_superior:
-            # Formatear las fechas en el nuevo formato
-            inicio_str = inicio.strftime('%d-%m-%Y %H:%M:%S')
-            fecha_obj_str = fecha_obj.strftime('%d-%m-%Y %H:%M:%S')
-            final_str = final.strftime('%d-%m-%Y %H:%M:%S')
-            ventanas_horarios.append([inicio_str, fecha_obj_str, final_str])
+        #if inicio >= limite_inferior and final <= limite_superior:
+        # Formatear las fechas en el nuevo formato
+        inicio_str = inicio.strftime('%d-%m-%Y %H:%M:%S')
+        fecha_obj_str = fecha_obj.strftime('%d-%m-%Y %H:%M:%S')
+        final_str = final.strftime('%d-%m-%Y %H:%M:%S')
+        ventanas_horarios.append([inicio_str, fecha_obj_str, final_str])
     
     # Entrega el inicio, hora de presentacion y final estimado del viaje
     return ventanas_horarios

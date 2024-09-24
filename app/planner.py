@@ -88,7 +88,7 @@ class Planning:
             self.no_hay_viajes = True
             pass
         else:
-            df.to_excel( "/static/tmp/" + str(fecha_formateada) + "/query_travels" + str(fecha_hora_formateada) + ".xlsx", index=False)
+            #df.to_excel( "/static/tmp/" + str(fecha_formateada) + "/query_travels" + str(fecha_hora_formateada) + ".xlsx", index=False)
             df = transform_dataframe(df)
             pd.set_option('display.float_format', '{:.0f}'.format)
             df = merged(self.fecha_formateada, df)

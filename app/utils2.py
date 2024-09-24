@@ -380,7 +380,7 @@ def group_by_id(df):
     })
     
     directory = os.getcwd()
-    df2.to_excel(directory + '\\static\\tmp\\planificacion3.xlsx')
+    #df2.to_excel(directory + '\\static\\tmp\\planificacion3.xlsx')
     return df2, min_hora_inicio, max_hora_salida
 
 def merge(df1, df2):
