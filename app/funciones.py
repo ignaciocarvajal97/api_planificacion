@@ -125,7 +125,7 @@ def sum_columns_in_matrix(matrix):
     # Convierte las sumas en un diccionario
     hour_sum_dict = column_sums.to_dict()
     #print(hour_sum_dict)
-    plot_dict(hour_sum_dict, len(hour_sum_dict.items()) )
+    # plot_dict(hour_sum_dict, len(hour_sum_dict.items()) )
     return ajustar_valores(hour_sum_dict)
 
 

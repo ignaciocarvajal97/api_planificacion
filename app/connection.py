@@ -103,8 +103,8 @@ def transform_dataframe(df):
     # Merge etapa_2 con etapa_3 para combinar fechas y horas
     merged = pd.merge(df[df['etapa_tipo'] == 3][['fk_servicio']], etapa_2, on='fk_servicio', how='inner')
     
-    print('ETAPA 2 ANTES:', etapa_2)
-    print('ETAPA 3 ANTES:', df[df['etapa_tipo'] == 3][['fk_servicio', 'etapa_1_fecha', 'etapa_1_hora']])
+    # print('ETAPA 2 ANTES:', etapa_2)
+    # print('ETAPA 3 ANTES:', df[df['etapa_tipo'] == 3][['fk_servicio', 'etapa_1_fecha', 'etapa_1_hora']])
 
     # Combinar etapa_1_fecha y etapa_1_hora de etapa_tipo=2 en etapa_tipo=3 para el mismo fk_servicio
     # for servicio_id in set(etapa_2['fk_servicio']).intersection(etapa_3['fk_servicio']):
@@ -119,7 +119,7 @@ def transform_dataframe(df):
     
     df[df['etapa_tipo'] == 3] = etapa_3
     
-    print('ETAPA 3 MERGED:', merged)
+    # print('ETAPA 3 MERGED:', merged)
 
     return df
 
