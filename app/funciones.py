@@ -160,7 +160,7 @@ def find_hours_of_max_values(hour_sum_dict, capacity):
 
     """
     max_value = max(hour_sum_dict.values())
-    max_hours = [hour for hour, value in hour_sum_dict.items() if value + 5 >= capacity]
+    max_hours = [hour for hour, value in hour_sum_dict.items() if value >= capacity]
     return max_hours
 
 def find_hours_of_max_values_20(hour_sum_dict, capacity):
