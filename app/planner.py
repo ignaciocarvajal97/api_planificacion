@@ -203,6 +203,7 @@ class Planning:
             
             ventanas_horarias = simulador_de_horarios(self.dates_with_hours, simulador(fk_servicio))
 
+            print("DICCIONARIO:", self.hour_sum_dict)
             fechas = find_hours_of_max_values(self.hour_sum_dict, self.capacidad)
             fechas_20 = find_hours_of_max_values_20(self.hour_sum_dict_20, self.capacidad_20)
             fechas_20_pesados = find_hours_of_max_values_20(self.hour_sum_dict_20_pesados, self.capacidad_20_pesados)
@@ -232,7 +233,7 @@ class Planning:
             hour_sum_from_dict_20_pesados = {}
             
             for diccionario in lista_dict:
-                dt = datetime.strptime(diccionario['fecha'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                dt = datetime.strptime(diccionario['fecha'], '%Y-%m-%d %H:%M:%S')
                 hora = dt.strftime("%d-%m-%Y %H:%M:%S")
                 
                 hour_sum_from_dict[hora] = diccionario['n_servicios_activos']
