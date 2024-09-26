@@ -190,7 +190,7 @@ def simulador_de_horarios(fecha_lista, dict_simulador):
         limite_inferior = fecha_obj.replace(hour=3, minute=0, second=0, microsecond=0)
         limite_superior = (fecha_obj + timedelta(days=1)).replace(hour=4, minute=0, second=0, microsecond=0)
      
-        print(inicio, final)
+        print("inicio:", inicio, "final:", final)
         # Filtrar las ventanas de tiempo basadas en los límites
         #if inicio >= limite_inferior and final <= limite_superior:
         # Formatear las fechas en el nuevo formato

@@ -81,6 +81,8 @@ def generate_hours_for_date(date):
     # Format the dates in the desired format 'dd-mm-yyyy HH:MM:SS'
     formatted_dates = [f'{dt.strftime("%d-%m-%Y %H:%M:%S")}' for dt in filtered_dates]
     
+    print("FORMATTED DATES:", formatted_dates)
+    
     return formatted_dates
 #genera una matriz que representa la planificacion del dia. lo hace poniendo un 1 si hay un viaje activo a esa hora
 def generate_availability_matrix(dataframe, dates_with_hours):
@@ -161,6 +163,7 @@ def find_hours_of_max_values(hour_sum_dict, capacity):
     """
     max_value = max(hour_sum_dict.values())
     max_hours = [hour for hour, value in hour_sum_dict.items() if value + 5 >= capacity]
+    print("max_hours:", max_hours, "capacidad:", capacity)
     return max_hours
 
 def find_hours_of_max_values_20(hour_sum_dict, capacity):
@@ -179,7 +182,7 @@ def find_hours_of_max_values_20(hour_sum_dict, capacity):
     """
     max_value = max(hour_sum_dict.values())
     max_hours = [hour for hour, value in hour_sum_dict.items() if value + 1 >= capacity]
-    print(max_hours, capacity)
+    print("max_hours_20:", max_hours, "capacidad:", capacity)
     return max_hours
 
 def initializator(df,date):
