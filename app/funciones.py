@@ -51,14 +51,14 @@ def generate_hours_for_date(date):
 import pytz  # Necesario para manejar zonas horarias
 from datetime import datetime, timedelta, time
 from zoneinfo import ZoneInfo  # Utiliza zoneinfo para manejar zonas horarias
-
+from app.time_ntp import now
 
 def generate_hours_for_date(date):
     # Convert the date into a datetime object
     date_obj = datetime.strptime(date, '%d-%m-%Y')
     
     pais = "America/Santiago"
-    resultado = obtener_hora_pais(pais)
+    resultado = now()# obtener_hora_pais(pais)
     print(resultado)
     resultado = resultado.replace(tzinfo=None)
 
