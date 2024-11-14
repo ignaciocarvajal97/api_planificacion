@@ -16,12 +16,12 @@ from datetime import datetime
 def connectionDB(query):
 
     # Datos de conexión
-    host = "190.171.188.230"
-    port = "5432"  # Puerto predeterminado de PostgreSQL
-    database = "topusDB"  # Reemplazar por el nombre real de la base de datos
-    user = "user_solo_lectura"
-    password = "4l13nW4r3.C0ntr4s3n4.S0l0.L3ctur4"
-    
+
+    host = "topusdb.c1usqc60wfod.us-east-1.rds.amazonaws.com"
+    port = "5432"
+    database = "topusDB"
+    user = "postgres"
+    password = "4y`05E}1Jued"
     #connection 
     try:
         # Establecer la conexión
@@ -49,11 +49,11 @@ def connectionDB(query):
 def connectionDB_todf(query):
 
     # Datos de conexión
-    host = "190.171.188.230"
-    port = "5432"  # Puerto predeterminado de PostgreSQL
-    database = "topusDB"  # Reemplazar por el nombre real de la base de datos
-    user = "user_solo_lectura"
-    password = "4l13nW4r3.C0ntr4s3n4.S0l0.L3ctur4"
+    host = "topusdb.c1usqc60wfod.us-east-1.rds.amazonaws.com"
+    port = "5432"
+    database = "topusDB"
+    user = "postgres"
+    password = "4y`05E}1Jued"
     #connection 
     try:
         # Establecer la conexión
@@ -205,7 +205,9 @@ def merged(date, df):
     filtered_df = df2[(df2['tiempo_estadia'] >= low_limit) & (df2['tiempo_estadia'] <= high_limit)]
     
     # Realizar el groupby por 'cli_desp_nombre' en el DataFrame filtrado y calcular el percentil 90
+
     grouped = filtered_df.groupby('fk_cliente_despacho')['tiempo_estadia'].quantile(1)
+
     
     # Resetear el índice para obtener un DataFrame plano
     grouped = grouped.reset_index()
