@@ -59,11 +59,11 @@ def generate_hours_for_date(date):
     
     pais = "America/Santiago"
     resultado = obtener_hora_pais(pais)
-
+    print(resultado)
     resultado = resultado.replace(tzinfo=None)
 
     # Calculate the limit time (resultado + 3 hours)
-    limit_time = resultado + timedelta(hours=2.5)
+    limit_time = resultado + timedelta(hours=3.3)
     
     # List of hours in 5-minute intervals
     hours = []

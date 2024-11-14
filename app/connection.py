@@ -205,7 +205,7 @@ def merged(date, df):
     filtered_df = df2[(df2['tiempo_estadia'] >= low_limit) & (df2['tiempo_estadia'] <= high_limit)]
     
     # Realizar el groupby por 'cli_desp_nombre' en el DataFrame filtrado y calcular el percentil 90
-    grouped = filtered_df.groupby('fk_cliente_despacho')['tiempo_estadia'].quantile(0.9)
+    grouped = filtered_df.groupby('fk_cliente_despacho')['tiempo_estadia'].quantile(1)
     
     # Resetear el índice para obtener un DataFrame plano
     grouped = grouped.reset_index()

@@ -65,7 +65,7 @@ def simular_servicio(fk_servicio: int, day: str, capacidad: int, capacidad_20: i
         return {"horarios": horarios, "horarios_20": horarios_20, "horarios_20_pesados": horarios_20_pesados}
     finally:
         # Libera los objetos y llama al recolector de basura
-        del dictionary
+        
         del planning
         gc.collect()
 
