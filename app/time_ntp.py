@@ -1,6 +1,7 @@
 import ntplib
 from datetime import datetime
 import logger
+import pytz
 
 time_offset = None
 
@@ -25,4 +26,5 @@ def now():
     sync_chile_time()
     if time_offset is None:
         return datetime.now()
-    return datetime.now() + time_offset
+    tz_chile = pytz.timezone('America/Santiago')
+    return tz_chile.localize(datetime.now() + time_offset)

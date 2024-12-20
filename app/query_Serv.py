@@ -50,8 +50,8 @@ def simulador(n_servicio):
     tiempos_estadia_df['tiempo_estadia'] = pd.to_timedelta(tiempos_estadia_df['tiempo_estadia']).dt.total_seconds() / 60
     
     # Definir los percentiles para identificar outliers (por ejemplo, 5% y 95%)
-    percentile_low = 10
-    percentile_high = 80
+    percentile_low = 50
+    percentile_high = 90
     
     # Calcular los percentiles para identificar los valores límite
     low_limit = tiempos_estadia_df['tiempo_estadia'].quantile(percentile_low / 100)
@@ -63,7 +63,7 @@ def simulador(n_servicio):
     
     tiempos_estadia = list(filtered_df['tiempo_estadia'])
     if len(tiempos_estadia) == 0:
-        tiempos_estadia = [180]
+        tiempos_estadia = [210]
     
 
     tiempos_en_minutos = []
@@ -138,10 +138,10 @@ def simulador(n_servicio):
     duracion_salida = T_viaje_presentacion
     
     duracion_llegada = (
-    (percentil_tiempo_estadia or 180) + 
-    (T_viaje_retorno or 120) + 
-    (T_estimado_devolucion or 60) + 
-    (T_viaje_devolucion or 60)
+    (percentil_tiempo_estadia or 310) + 
+    (T_viaje_retorno or 150) + 
+    (T_estimado_devolucion or 90) + 
+    (T_viaje_devolucion or 90)
     )
 
     #duracion_llegada = percentil_tiempo_estadia + T_viaje_retorno + T_estimado_devolucion + T_viaje_devolucion 

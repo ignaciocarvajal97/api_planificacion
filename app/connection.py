@@ -16,12 +16,20 @@ from datetime import datetime
 def connectionDB(query):
 
     # Datos de conexión
-
     host = "topusdb.c1usqc60wfod.us-east-1.rds.amazonaws.com"
     port = "5432"
     database = "topusDB"
     user = "postgres"
     password = "4y`05E}1Jued"
+
+    """
+    # Datos de conexión
+    host = "190.171.188.230"
+    port = "5432"
+    database = "topusDB"
+    user = "postgres"
+    password = "p0stgr3s.n0djs.r00t"
+    """
     #connection 
     try:
         # Establecer la conexión
@@ -47,13 +55,20 @@ def connectionDB(query):
 
 
 def connectionDB_todf(query):
-
+    
     # Datos de conexión
     host = "topusdb.c1usqc60wfod.us-east-1.rds.amazonaws.com"
     port = "5432"
     database = "topusDB"
     user = "postgres"
     password = "4y`05E}1Jued"
+    """
+    host = "190.171.188.230"
+    port = "5432"
+    database = "topusDB"
+    user = "postgres"
+    password = "p0stgr3s.n0djs.r00t"
+    """
     #connection 
     try:
         # Establecer la conexión
@@ -193,8 +208,8 @@ def merged(date, df):
     df2['tiempo_estadia'] = pd.to_timedelta(df2['tiempo_estadia']).dt.total_seconds() / 60
     
     # Definir los percentiles para identificar outliers (por ejemplo, 5% y 95%)
-    percentile_low = 10
-    percentile_high = 80
+    percentile_low = 50
+    percentile_high = 100
     
     # Calcular los percentiles para identificar los valores límite
     low_limit = df2['tiempo_estadia'].quantile(percentile_low / 100)

@@ -63,8 +63,8 @@ def generate_hours_for_date(date):
     resultado = resultado.replace(tzinfo=None)
 
     # Calculate the limit time (resultado + 3 hours)
-    limit_time = resultado + timedelta(hours=3.3)
-    
+    limit_time = resultado# + timedelta(hours=2.5)
+    print(resultado)
     # List of hours in 5-minute intervals
     hours = []
     for hour in range(5, 23):  # Updated to include all hours of the day
@@ -76,7 +76,7 @@ def generate_hours_for_date(date):
     dates_with_hours = [date_obj + timedelta(hours=int(h.split(':')[0]), minutes=int(h.split(':')[1])) for h in hours]
     
     # Filter out dates that are less than or equal to the limit_time
-    filtered_dates = [dt for dt in dates_with_hours if dt > limit_time]
+    filtered_dates = [dt for dt in dates_with_hours ]#if dt > limit_time]
     
     # Format the dates in the desired format 'dd-mm-yyyy HH:MM:SS'
     formatted_dates = [f'{dt.strftime("%d-%m-%Y %H:%M:%S")}' for dt in filtered_dates]
