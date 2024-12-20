@@ -12,7 +12,8 @@ import os
 from app.connection import merged, connectionDB_todf, transform_dataframe
 from app.utils2 import preprocess, time_filler, date_filter, group_by_id, merge
 #from gantt import *
-from app.dfconsumer import df_portuarios
+from app.dfconsumer import df_portuarios, filter_by_date
+from app.data_scrapper import * 
 from datetime import datetime
 from datetime import datetime, timedelta
 from app.funciones import  encontrar_ventanas_sin_coincidencia, find_hours_of_max_values, find_hours_of_max_values_20, generate_hours_for_date, generate_availability_matrix, sum_columns_in_matrix
@@ -107,7 +108,7 @@ class Planning:
     def preprocessing(self):
         
         try: 
-            df_port = df_portuarios(self.start_date, self.end_date, self.download)
+            df_port = filter_by_date(data_scrapper(), self.start_date, self.end_date)# df_portuarios(self.start_date, self.end_date, self.download)
         except:
             print('Error al descargar directos diferidos')
             df_port = pd.DataFrame(columns=['contenedor', 'fecha', 'comuna', 'empresa', 'servicios', 'cont_tamano', 'contenedor_peso'])
