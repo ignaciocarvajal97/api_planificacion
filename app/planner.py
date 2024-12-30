@@ -121,6 +121,7 @@ class Planning:
 
             self.df = date_filter(self.df, self.start_date, self.end_date)
             self.df, self.df_visualization = time_filler(self.df, df_port)
+            
             self.df = self.df[["id", "hora_salida", "hora_llegada"]]
             self.df, self.min_hora_inicio, self.max_hora_salida = group_by_id(
                 self.df_visualization)

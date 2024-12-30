@@ -337,7 +337,7 @@ def time_filler(df1, df_portuarios, T_estimado_retiros=100,  T_estimado_presenta
     
     # Convert dictionary to DataFrame
     df_visualization = pd.DataFrame(df_visualization)
-    df_visualization = df_visualization.drop_duplicates()
+    df_visualization = df_visualization.drop_duplicates(subset=['id'])
     
 
     
@@ -352,7 +352,7 @@ def time_filler(df1, df_portuarios, T_estimado_retiros=100,  T_estimado_presenta
     df_model["id"] = idservice 
     df_model['hora_salida'] = hora_salida
     df_model['hora_llegada'] = hora_llegada
-    df_model = df_model.drop_duplicates()
+    df_model = df_model.drop_duplicates(subset=['id'])
     #print("model", len(df_model))
     #print("port", len(df_portuarios)-1)
     #print("vis", len(df_visualization))
