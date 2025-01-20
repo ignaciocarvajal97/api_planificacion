@@ -227,7 +227,7 @@ def plot_dict(dictionary, max_labels= 24):
     plt.tight_layout()
     plt.show()
 
-def encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias):
+def encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias, devolucion_sai):
     indices = []
     #print("fecha : ", fechas)
     #print("ventanas horarias: ", ventanas_horarias)
@@ -235,6 +235,7 @@ def encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias):
     
     for i, ventana in enumerate(ventanas_horarias):
         inicio_ventana = datetime.strptime(ventana[0], '%d-%m-%Y %H:%M:%S')
+        hora_presentacion = datetime.strptime(ventana[1], '%d-%m-%Y %H:%M:%S')
         final_ventana = datetime.strptime(ventana[2], '%d-%m-%Y %H:%M:%S')
         
         coincide = False
@@ -247,7 +248,12 @@ def encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias):
                 break
 
         if not coincide:
-            indices.append(i)
+            if devolucion_sai == 1: 
+                indices.append(i)
+            else:
+                if hora_presentacion.hour < 17:
+                    indices.append(i)
+            print(ventanas_horarias[i][1])
     elementos_seleccionados = [ventanas_horarias[i][1] for i in indices]
     return elementos_seleccionados
 

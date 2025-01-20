@@ -1,6 +1,8 @@
 from app.connection import * 
 
 def data_scrapper():
-    query = """select * from scrapper_retiros"""
+    query = """SELECT DISTINCT ON (contenedor) *
+FROM scrapper_retiros
+ORDER BY contenedor"""
     df = connectionDB_todf(query)
     return df

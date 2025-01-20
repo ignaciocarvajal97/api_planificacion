@@ -96,3 +96,5 @@ def diccionario(fecha: str = Path(..., pattern=r"^\d{4}-\d{2}-\d{2}$", descripti
     finally:
         del planning
         gc.collect()  # Forzar la liberación de la memoria
+
+

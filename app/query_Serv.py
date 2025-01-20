@@ -158,7 +158,7 @@ def simulador(n_servicio):
     duracion_salida = procesar_duracion(duracion_salida, 230)
     duracion_llegada = procesar_duracion(duracion_llegada, 300)
 
-    return {'duracion_salida': duracion_salida , 'duracion_llegada': duracion_llegada }
+    return {'duracion_salida': duracion_salida , 'duracion_llegada': duracion_llegada, 'comuna_devolucion': comuna_devolucion }
 
 
 #simula todas las ventanas horarias que usaria el servicio 

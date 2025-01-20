@@ -28,7 +28,7 @@ directorio_actual = os.getcwd()
 dpw_dir = directorio_actual + "\secuencias\\dpw"
 tps_dir = directorio_actual + "\secuencias\\tps"
 sti_dir = directorio_actual + "\secuencias\\sti"
-print(dpw_dir)
+
 
 def delete_dir_content():
     directorio_actual = os.getcwd()

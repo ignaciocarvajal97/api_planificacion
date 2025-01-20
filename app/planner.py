@@ -108,20 +108,26 @@ class Planning:
     def preprocessing(self):
         
         try: 
-            df_port = filter_by_date(data_scrapper(), self.start_date, self.end_date)# df_portuarios(self.start_date, self.end_date, self.download)
+            #df_port = filter_by_date(data_scrapper(), self.start_date, self.end_date)
+            #df_port = df_port.drop_duplicates(subset='contenedor', keep='first')
+            #print(df_port)# df_portuarios(self.start_date, self.end_date, self.download)
+            df_port = df_portuarios(self.start_date, self.end_date, self.download)
+           
         except:
             print('Error al descargar directos diferidos')
             df_port = pd.DataFrame(columns=['contenedor', 'fecha', 'comuna', 'empresa', 'servicios', 'cont_tamano', 'contenedor_peso'])
         
         if self.no_hay_viajes:
             pass
+
         else:
 
             self.df = preprocess(self.df)
+            
 
             self.df = date_filter(self.df, self.start_date, self.end_date)
             self.df, self.df_visualization = time_filler(self.df, df_port)
-            
+
             self.df = self.df[["id", "hora_salida", "hora_llegada"]]
             self.df, self.min_hora_inicio, self.max_hora_salida = group_by_id(
                 self.df_visualization)
@@ -145,6 +151,8 @@ class Planning:
             self.availability_matrix = generate_availability_matrix(self.df_visualization, self.dates_with_hours)
             self.availability_matrix_20 = generate_availability_matrix(self.df_20, self.dates_with_hours)
             self.availability_matrix_20_pesados = generate_availability_matrix(self.df_20_pesados, self.dates_with_hours)
+
+
         
             
             # Llama a la función para obtener el diccionario
@@ -164,8 +172,14 @@ class Planning:
             
             #creo copia del dataframe
             df_20 = self.df_visualization.copy()
+
             self.df_20 = df_20[df_20["cont_tamano"]=="20"]   
             self.df_20_pesados = self.df_20[self.df_20['peso_cont']<10000]
+            
+            self.df_presentaciones = self.df_visualization[self.df_visualization['etapa'].isin(['trayecto', 'presentacion'])]
+            self.df_retiros_sai = self.df_visualization[self.df_visualization['etapa'] == 'retiro_full_sai']
+            self.df_retiros_valpo = self.df_visualization[self.df_visualization['etapa'] == 'retiro_full_val']
+
             
             # Llama a la función para obtener la matriz de disponibilidad
             #si la hora de self.dates_with_hours tiene un servicio activo, 
@@ -173,7 +187,10 @@ class Planning:
             self.availability_matrix = generate_availability_matrix(self.df_visualization, self.dates_with_hours)
             self.availability_matrix_20 = generate_availability_matrix(self.df_20, self.dates_with_hours)
             self.availability_matrix_20_pesados = generate_availability_matrix(self.df_20_pesados, self.dates_with_hours)
-        
+
+            self.availability_matrix_presentaciones = generate_availability_matrix(self.df_presentaciones, self.dates_with_hours)
+            self.availability_matrix_retiros_sai = generate_availability_matrix(self.df_retiros_sai, self.dates_with_hours)
+            self.availability_matrix_retiros_valpo = generate_availability_matrix(self.df_retiros_valpo, self.dates_with_hours)
             
             # Llama a la función para obtener el diccionario
             #suma todos los unos que hayan por hora. es decir que el diccionario tiene el total de servicios activos a cada hora
@@ -181,6 +198,10 @@ class Planning:
             self.hour_sum_dict_20 = sum_columns_in_matrix(self.availability_matrix_20)
             self.hour_sum_dict_20_pesados = sum_columns_in_matrix(self.availability_matrix_20_pesados)
             
+            self.hour_sum_dict_presentaciones = sum_columns_in_matrix(self.availability_matrix_presentaciones)
+            self.hour_sum_dict_retiros_sai = sum_columns_in_matrix(self.availability_matrix_retiros_sai)
+            self.hour_sum_dict_retiros_valpo = sum_columns_in_matrix(self.availability_matrix_retiros_valpo)
+
             merged_dict = {}
             
             for key in list(self.hour_sum_dict.keys()):
@@ -188,9 +209,12 @@ class Planning:
                     'activos': self.hour_sum_dict[key],
                     '20': self.hour_sum_dict_20[key],
                     '20_pesados': self.hour_sum_dict_20_pesados[key],
+                    'presentaciones': self.hour_sum_dict_presentaciones[key],
+                    'retiros_sai': self.hour_sum_dict_retiros_sai[key],
+                    'retiros_valpo': self.hour_sum_dict_retiros_valpo[key],
                 }
             
-            print("DICCIONARIO:", merged_dict)
+            #print("DICCIONARIO:", merged_dict)
             return merged_dict
     
     
@@ -220,7 +244,7 @@ class Planning:
     def simular_disponibilidad_con_dict(self, lista_dict, fk_servicio, capacidad, capacidad_20, capacidad_20_pesados):
         if self.no_hay_viajes:
             return generate_hours_for_date(self.fecha_formateada), generate_hours_for_date(self.fecha_formateada), generate_hours_for_date(self.fecha_formateada)
-        else:
+        else:        
             #se toma un servicio, se simula su inicio y fin con simulador y simulador_de_horarios entrega las horas a las que se puede agendar
             self.capacidad = capacidad
             self.capacidad_20 = capacidad_20
@@ -246,9 +270,18 @@ class Planning:
             fechas_20 = find_hours_of_max_values_20(hour_sum_from_dict_20, self.capacidad_20)
             fechas_20_pesados = find_hours_of_max_values_20(hour_sum_from_dict_20_pesados, self.capacidad_20_pesados)
             #print(fechas)
-            elementos_seleccionados = encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias)
-            elementos_seleccionados_20 = encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias)
-            elementos_seleccionados_20_pesados = encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias)
+
+            comuna = simulador(fk_servicio)['comuna_devolucion']
+            print('comunnnnasjdadsj')
+            print(comuna)
+            if comuna != 'San Antonio':
+                devolucion_sai = 0
+            else:
+                devolucion_sai = 1
+
+            elementos_seleccionados = encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias, devolucion_sai)
+            elementos_seleccionados_20 = encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias, devolucion_sai)
+            elementos_seleccionados_20_pesados = encontrar_ventanas_sin_coincidencia(fechas, ventanas_horarias, devolucion_sai)
 
             return elementos_seleccionados, elementos_seleccionados_20, elementos_seleccionados_20_pesados
     
